@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: mada-digital-market
+    runtime: node
+    buildCommand: npm ci && npm run build
+    startCommand: npm run start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_VERSION
+        value: 22
+      - key: NEXT_PUBLIC_SUPABASE_URL
+        sync: false
+      - key: NEXT_PUBLIC_SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: PAPI_MG_API_KEY
+        sync: false
+      - key: PAPI_MG_BASE_URL
+        value: https://app.papi.mg
+      - key: NEXT_PUBLIC_APP_URL
+        sync: false
