@@ -20,5 +20,9 @@ services:
         sync: false
       - key: PAPI_MG_BASE_URL
         value: https://app.papi.mg
+      - key: PAPI_MG_NOTIFICATION_URL
+        sync: false
+      - key: PAPI_MG_TEST_MODE
+        value: "true"
       - key: NEXT_PUBLIC_APP_URL
         sync: false

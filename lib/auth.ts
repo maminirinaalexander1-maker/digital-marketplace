@@ -298,6 +298,19 @@ export async function logout() {
   document.cookie = `${COOKIE_NAME}=; path=/; max-age=0; SameSite=Lax`;
 }
 
+export async function requestPasswordReset(email: string): Promise<boolean> {
+  if (!supabase) return false;
+
+  const normalizedEmail = normalizeEmail(email);
+  if (!normalizedEmail || !normalizedEmail.includes('@')) return false;
+
+  const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
+    redirectTo: `${window.location.origin}/reset-password`,
+  });
+
+  return !error;
+}
+
 export function isAllowedRole(user: SessionUser | null, allowedRoles: UserRole | UserRole[]) {
   if (!user) return false;
   const list = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles];

@@ -15,15 +15,19 @@ export default function ClientShell({ children }: { children: React.ReactNode })
             <span className="brand-mark">M</span>
             <span>Mada Digital Market</span>
           </Link>
-          <nav className="nav-links">
+          <nav className="nav-links" aria-label="Navigation principale">
             <Link href="/">Catalogue</Link>
             <Link href="/seller">Vendre</Link>
             <Link href="/admin">Admin</Link>
             {user ? (
               <div className="user-menu">
-                <Link href="/dashboard" className="user-badge">{user.role.toUpperCase()}</Link>
+                <Link href="/dashboard" className="user-badge" aria-label={`Ouvrir l’espace ${user.role}`}>
+                  {user.role.toUpperCase()}
+                </Link>
                 <button
                   className="secondary-btn"
+                  type="button"
+                  aria-label="Se déconnecter"
                   onClick={async () => {
                     await logout();
                     setUser(null);
@@ -42,6 +46,16 @@ export default function ClientShell({ children }: { children: React.ReactNode })
         </div>
       </header>
       {children}
+      <footer className="site-footer">
+        <div className="container footer-inner">
+          <span>© {new Date().getFullYear()} Mada Digital Market</span>
+          <nav aria-label="Liens secondaires">
+            <Link href="/support">Support</Link>
+            <Link href="/privacy">Confidentialité</Link>
+            <Link href="/terms">Conditions</Link>
+          </nav>
+        </div>
+      </footer>
     </>
   );
 }

@@ -22,6 +22,8 @@ SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 GEMINI_API_KEY=your-gemini-api-key
 PAPI_MG_API_KEY=your-papi-mg-api-key
 PAPI_MG_BASE_URL=https://app.papi.mg
+PAPI_MG_NOTIFICATION_URL=http://localhost:3000/api/payments/webhook
+PAPI_MG_TEST_MODE=false
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
@@ -86,4 +88,13 @@ https://mon-projet.vercel.app/**
 https://mon-projet.onrender.com/**
 ```
 
-Le bucket `digital-files` est encore public pour les tests. Avant la production commerciale, il faudra mettre en place la confirmation Papi.mg par webhook, puis passer le bucket en privé et servir des URLs signées.
+Le checkout Papi.mg utilise `Token`, `reference`, `successUrl`, `failureUrl` et `notificationUrl`. Le webhook vérifie `paymentReference` et `notificationToken` avant de passer une commande à `paid`.
+
+En local, `PAPI_MG_NOTIFICATION_URL` doit être une URL HTTPS publique (par exemple un tunnel ngrok), car Papi.mg ne peut pas appeler `localhost`. Le bucket `digital-files` est encore public pour les tests ; avant la production commerciale, passez-le en privé et servez uniquement des URLs signées.
+
+Documentation officielle consultée :
+- https://docs.papi.mg/fr/docs/developper-guide/integration-guide
+- https://docs.papi.mg/fr/docs/developper-guide/sandbox-environment
+- https://docs.papi.mg/fr/docs/developper-guide/preparing-for-production
+
+Le mode sandbox se configure dans le tableau de bord Papi.mg, au niveau de l’application. Pour les tests documentés, Papi fournit des numéros de téléphone et montants déclencheurs ; ne passez en production qu’après avoir testé les statuts `SUCCESS`, `PENDING` et `FAILED`.

@@ -74,23 +74,24 @@ export default function HomePage() {
       return;
     }
 
-    const response = await fetch('/api/checkout', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        productId: product.id,
-        email,
-      }),
-    });
+    try {
+      const response = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productId: product.id, email }),
+      });
 
-    const result = await response.json();
+      const result = await response.json();
 
-    if (!response.ok || !result.paymentUrl) {
-      alert(result.error || 'Une erreur est survenue lors du checkout.');
-      return;
+      if (!response.ok || !result.paymentUrl) {
+        alert(result.error || 'Une erreur est survenue lors du checkout.');
+        return;
+      }
+
+      window.location.assign(result.paymentUrl);
+    } catch {
+      alert('Le service de paiement est temporairement indisponible.');
     }
-
-    window.location.assign(result.paymentUrl);
   }
 
   return (

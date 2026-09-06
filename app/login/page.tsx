@@ -67,6 +67,10 @@ export default function LoginPage() {
             />
           </div>
 
+          <div style={{ textAlign: 'right', marginBottom: '1rem' }}>
+            <Link href="/forgot-password" className="text-link">Mot de passe oublié ?</Link>
+          </div>
+
           <div className="field" style={{ marginBottom: '1rem' }}>
             <label htmlFor="password">Mot de passe</label>
             <input
@@ -86,7 +90,7 @@ export default function LoginPage() {
           </div>
 
           <p className="muted" style={{ marginTop: '1rem', textAlign: 'center' }}>
-            Pas de compte ? <a href="/signup" style={{ color: '#8fe7be', fontWeight: 700 }}>Créer un compte</a>
+            Pas de compte ? <Link href="/signup" className="text-link">Créer un compte</Link>
           </p>
         </form>
       </div>

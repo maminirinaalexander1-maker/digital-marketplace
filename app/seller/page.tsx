@@ -11,6 +11,7 @@ export default function SellerPage() {
   const [user] = useState<SessionUser | null>(() => getSession());
   const [title, setTitle] = useState('');
   const [price, setPrice] = useState('15000');
+  const [category, setCategory] = useState('Design');
   const [description, setDescription] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const [isRewriting, setIsRewriting] = useState(false);
@@ -57,8 +58,19 @@ export default function SellerPage() {
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (!title.trim() || !description.trim() || !file) {
-      setStatus('Titre, description et fichier sont requis.');
+    if (title.trim().length < 3 || description.trim().length < 10 || !file) {
+      setStatus('Ajoutez un titre de 3 caractères, une description de 10 caractères et un fichier.');
+      return;
+    }
+
+    const numericPrice = Number(price);
+    if (!Number.isInteger(numericPrice) || numericPrice < 100) {
+      setStatus('Le prix doit être un nombre entier d’au moins 100 MGA.');
+      return;
+    }
+
+    if (file.size > 50 * 1024 * 1024) {
+      setStatus('Le fichier ne doit pas dépasser 50 Mo.');
       return;
     }
 
@@ -81,8 +93,9 @@ export default function SellerPage() {
         },
         body: JSON.stringify({
           title,
-          price: Number(price),
+          price: numericPrice,
           description,
+          category,
           file_url: fileUrl,
           image_url: file.name.split('.')[0].slice(0, 12) || '📦',
         }),
@@ -97,6 +110,7 @@ export default function SellerPage() {
       setStatus('Produit ajouté avec succès.');
       setTitle('');
       setPrice('15000');
+      setCategory('Design');
       setDescription('');
       setFile(null);
       const fileInput = document.getElementById('product-file') as HTMLInputElement | null;
@@ -130,6 +144,16 @@ export default function SellerPage() {
           <div className="field">
             <label htmlFor="price">Prix MGA</label>
             <input id="price" type="number" min="0" step="100" value={price} onChange={(e) => setPrice(e.target.value)} />
+          </div>
+
+          <div className="field">
+            <label htmlFor="category">Catégorie</label>
+            <select id="category" value={category} onChange={(e) => setCategory(e.target.value)}>
+              <option value="Design">Design</option>
+              <option value="Marketing">Marketing</option>
+              <option value="Productivité">Productivité</option>
+              <option value="Automatisation">Automatisation</option>
+            </select>
           </div>
 
           <div className="field-wide">

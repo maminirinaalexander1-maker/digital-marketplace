@@ -1,38 +1,62 @@
-import Link from 'next/link';
+'use client';
 
-type SearchParams = {
-  download?: string;
-  title?: string;
+import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
+import { useEffect, useState } from 'react';
+
+type Order = {
+  title: string;
+  status: 'pending' | 'paid' | 'failed';
+  downloadUrl: string | null;
 };
 
-export default async function CheckoutSuccessPage({
-  searchParams,
-}: {
-  searchParams: Promise<SearchParams>;
-}) {
-  const params = await searchParams;
-  const download = params.download || '';
-  const title = params.title || 'Votre achat';
+function CheckoutSuccessContent() {
+  const searchParams = useSearchParams();
+  const orderId = searchParams.get('order');
+  const accessToken = searchParams.get('token');
+  const [order, setOrder] = useState<Order | null>(null);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (!orderId || !accessToken) return;
+
+    fetch(`/api/orders/${encodeURIComponent(orderId)}?token=${encodeURIComponent(accessToken)}`)
+      .then(async (response) => {
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Commande introuvable.');
+        setOrder(data.order);
+      })
+      .catch((requestError: unknown) => {
+        setError(requestError instanceof Error ? requestError.message : 'Erreur de commande.');
+      });
+  }, [accessToken, orderId]);
+
+  const displayedError = error || (!orderId || !accessToken ? 'Lien de commande incomplet.' : '');
 
   return (
     <main className="page-shell">
       <div className="success-box">
-        <span className="eyebrow">Paiement validé</span>
-        <h1>Merci pour votre achat !</h1>
+        <span className="eyebrow">Commande</span>
+        <h1>{order?.status === 'paid' ? 'Paiement confirmé' : 'Paiement en attente'}</h1>
         <p>
-          Votre commande a été enregistrée avec succès. Vous pouvez télécharger le fichier dès maintenant.
+          {order?.status === 'paid'
+            ? 'Votre paiement est confirmé. Le téléchargement est disponible pendant 10 minutes.'
+            : 'Votre commande est enregistrée. Le téléchargement sera disponible après confirmation du paiement.'}
         </p>
 
         <div className="download-card">
-          <strong>{title}</strong>
-          {download ? (
+          <strong>{order?.title || 'Vérification de votre commande...'}</strong>
+          {order?.downloadUrl ? (
             <p style={{ marginBottom: 0 }}>
-              <a className="primary-btn" href={download} target="_blank" rel="noreferrer">
+              <a className="primary-btn" href={order.downloadUrl} target="_blank" rel="noreferrer">
                 Télécharger le fichier
               </a>
             </p>
+          ) : displayedError ? (
+            <p className="muted">{displayedError}</p>
           ) : (
-            <p className="muted">Le lien de téléchargement n’est pas disponible pour le moment.</p>
+            <p className="muted">Téléchargement indisponible pour le moment.</p>
           )}
         </div>
 
@@ -41,5 +65,13 @@ export default async function CheckoutSuccessPage({
         </div>
       </div>
     </main>
+  );
+}
+
+export default function CheckoutSuccessPage() {
+  return (
+    <Suspense fallback={<main className="page-shell"><div className="success-box">Chargement de la commande...</div></main>}>
+      <CheckoutSuccessContent />
+    </Suspense>
   );
 }
